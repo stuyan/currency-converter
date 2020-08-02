@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="utf-8">
+    <title>История операций</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container">
+
+        <div sec:authorize="isAuthenticated()">
+            <h2>История</h2>
+
+            <form th:action="@{/history}" th:object="${filter}" method="GET" class="form-signin">
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="col">
+                            <input type="date" th:field="*{date}"
+                                   min="2010-01-01" max="2030-12-31" class="form-control">
+                        </div>
+                        <div class="col">
+                            <select th:field="*{fromCurrency}" class="custom-select">
+                                <option th:each="currency : ${currencies}"
+                                        th:value="${currency.id}"
+                                        th:utext="${currency.id + ' (' + currency.name + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select th:field="*{toCurrency}" class="custom-select">
+                                <option th:each="currency : ${currencies}"
+                                        th:value="${currency.id}"
+                                        th:utext="${currency.id + ' (' + currency.name + ')'}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-lg btn-primary btn-block mb-3">Поиск</button>
+            </form>
+
+            <div th:if="${history.isEmpty()}">
+                <span>Ничего не найдено.</span>
+            </div>
+
+            <table th:if="${!history.isEmpty()}" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Исходная валюта</th>
+                        <th>Целевая валюта</th>
+                        <th>Исходная сумма</th>
+                        <th>Получаемая сумма</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="record : ${history}">
+                        <td th:utext="${record.fromCurrency + ' (' + record.fromCurrencyName + ')'}"></td>
+                        <td th:utext="${record.toCurrency + ' (' + record.toCurrencyName + ')'}"></td>
+                        <td th:utext="${record.fromValue}"></td>
+                        <td th:utext="${record.toValue}"></td>
+                        <td th:text="${#dates.format(record.date, 'dd.MM.yyyy')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

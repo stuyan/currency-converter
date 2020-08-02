@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Конвертер валют</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container">
+
+        <div sec:authorize="!isAuthenticated()">
+            <h1>Добро пожаловать!</h1>
+            <h2>Зарегистрируйтесь, чтобы конвертировать валюту.</h2>
+        </div>
+
+        <div sec:authorize="isAuthenticated()" class="text-center">
+            <h2>Конвертер</h2>
+
+            <form th:action="@{/conversion}" th:object="${form}" method="POST" class="form-signin">
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="col">
+                            <select th:field="*{fromCurrency}" class="custom-select">
+                                <option th:each="currency : ${currencies}"
+                                        th:value="${currency.id}"
+                                        th:utext="${currency.id + ' (' + currency.name + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select th:field="*{toCurrency}" class="custom-select">
+                                <option th:each="currency : ${currencies}"
+                                        th:value="${currency.id}"
+                                        th:utext="${currency.id + ' (' + currency.name + ')'}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="col">
+                            <input type="number" th:field="*{fromValue}" class="form-control"/>
+                        </div>
+                        <div class="col">
+                            <input type="text" th:field="*{toValue}" class="form-control" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-lg btn-primary mb-3 convert">Конвертировать</button>
+            </form>
+
+            <a th:href="@{/history}">Посмотреть историю конвертаций</a>
+        </div>
+    </div>
+</body>
+
+</html>
